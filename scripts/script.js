@@ -1,22 +1,145 @@
-// "Explore" functions
-// Get answers from "form" and Fetch
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDPScRz-SR8AB5ezkNTqzsaDCuPPBL-oco",
+    authDomain: "referential-explore-account.firebaseapp.com",
+    projectId: "referential-explore-account",
+    storageBucket: "referential-explore-account.appspot.com",
+    messagingSenderId: "410406980356",
+    appId: "1:410406980356:web:8fec9db57124cd70249e51"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+// Initialize Firestore
+const db = firebase.firestore();
+//Initialize Auth
+const auth = firebase.auth();
+const user = auth.currentUser;
 
 // Main HTML elements
-let exploreSection = document.querySelector(".explore_section");
-let cardDisplaySection = document.querySelector(".card_display");
-let searchForm = document.querySelector("#explore_form");
+//"Explore" elements
 let exploreAnchor = document.querySelector("#explore");
+let exploreSection = document.querySelector(".explore_section");
+let searchForm = document.querySelector("#explore_form");
+let cardDisplaySection = document.querySelector(".card_display");
+
+//"Account" elements
 let accountAnchor = document.querySelector("#account");
+let accountSection = document.querySelector(".account_section");
+let signUpForm = document.querySelector("#account_form_signUp");
+let logInForm = document.querySelector("#account_form_logIn");
+
+// AUTH main functions:
+//Log in function
+logInForm.addEventListener("submit", async function (event){
+    event.preventDefault();
+    let email = document.getElementById("logIn_email").value;
+    let password = document.getElementById("logIn_password").value;
+
+    try {
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                console.log('User authenticated')
+                const user = userCredential.user;
+                console.log(userCredential);
+                userEmail = email;
+                console.log(`Hello, ${email}`);
+                //logInForm.reset();
+            });
+    } catch (error) {
+        console.log('Invalid user or password');
+    }
+})
+
+//Sign up function
+signUpForm.addEventListener("submit", async function (event){
+    event.preventDefault();
+    let name = document.getElementById("signUp_name").value;
+    let email = document.getElementById("signUp_email").value;
+    let password = document.getElementById("signUp_password").value;
+    let rePassword = document.getElementById("signUp_rePassword").value;
+
+    //Validation:
+    const nameRegex = /^[a-z0-9_-]{3,16}$/;
+    const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
+    const passwordRegex = /(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/;
+    if (!nameRegex.test(name)){
+        alert("Name can contain numbers, leters, '_' and '-'.");
+        return;
+    }
+    if(!emailRegex.test(email)){
+        alert("The email format is not allowed.");
+        return;
+    }
+    if(password != rePassword){
+        alert("Repeated password did not match with the first one.");
+        return;
+    }
+    if(!passwordRegex.test(password)){
+        alert("Password should contain one lowercase, one uppercase, one number and at least 8 characters.");
+        return;
+    }
+    //Create user:
+    try {
+        await auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                userCredential.user.updateProfile({
+                    displayName: name
+                });
+                console.log('User registered');
+                let user = userCredential.user;
+                console.log(user);
+                signUpForm.reset();
+            });
+    } catch(error) {
+        console.log(`There has been an error with code: ${error.code}: ${error.message}`)
+    }
+});
+
+
+/* 
+//Logout function
+logOutButton.addEventListener('click', function (){
+    auth.signOut().then(() => {
+        window.location.href = "/pages/question.html"
+        console.log('Logout user');
+    }).catch((error) => {
+      console.log('Error: ', error)
+    });
+})
+*/
+
+
+
+
+
+
+
+
+// "Explore" functions
+// Get answers from "form" and Fetch
 
 // Hide-show function:
 function hideShow(element){
     element.classList.toggle("hidden");
 };
 
+// Show-hide "Account" form:
+accountAnchor.addEventListener("click", function (event){
+    event.preventDefault();
+    hideShow(accountSection);
+    if(!exploreSection.classList.contains("hidden")){
+        hideShow(exploreSection);
+    }
+});
+
 // Show-hide "Explore" form:
 exploreAnchor.addEventListener("click", function (event){
     event.preventDefault();
     hideShow(exploreSection);
+    if(!accountSection.classList.contains("hidden")){
+        hideShow(accountSection);
+    }
 });
 
 // Search button function:
