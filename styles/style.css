@@ -1,0 +1,117 @@
+* {
+    font-family: Helvetica, Arial;
+}
+
+:root {
+    --base-light-grey: rgb(230, 230, 230);
+    --color1: rgb(196, 196, 196);
+}
+
+h1 {
+    font-size: 10vw;
+    margin: 0;
+}
+h2 {
+    font-size: 1.5em;
+}
+p {
+    margin:10px;
+}
+
+a {
+    text-decoration: none;
+}
+a:visited {
+    color: rgb(0, 0, 0);
+}
+a:hover {
+    color: white;
+}
+
+html{
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    min-height: 100%;
+    background-color: var(--base-light-grey);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+input {
+    border: 0;
+    margin: 2px;
+    text-align: center;
+}
+
+
+/* Header */
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.explore_account{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Main */
+.hidden{
+    display: none;
+}
+
+/* Explore section */
+
+/* Card Section */
+.card_section{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 90%;
+    
+}
+.card {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    
+    margin: 10% 0 10% 0;
+    border-radius: 30px;
+    width: 100%;
+    background-color: var(--color1);
+    text-align: center;
+}
+.card img{
+    width: 100%;
+
+}
+
+
+/* Footer */
+footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    background-color: rgb(221, 221, 221);
+}
+.social_network_logo{
+    width: 38px;
+    opacity: 0.3;
+    transition: all 5s ease-in 0;
+}
+.social_network_logo:hover{
+    opacity: 1;
+}
