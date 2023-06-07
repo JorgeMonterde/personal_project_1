@@ -28,8 +28,13 @@ let accountAnchor = document.querySelector("#account");
 let accountSection = document.querySelector(".account_section");
 let signUpForm = document.querySelector("#account_form_signUp");
 let logInForm = document.querySelector("#account_form_logIn");
+let logOutButton = document.querySelector("#log_out_button");
 
-// AUTH main functions:
+//"Detail card" elements
+//let addToProjectForm = document.getElementById("add_to_project_form");
+
+
+// AUTHENTIFICATION main functions:
 //Log in function
 logInForm.addEventListener("submit", async function (event){
     event.preventDefault();
@@ -79,35 +84,95 @@ signUpForm.addEventListener("submit", async function (event){
         alert("Password should contain one lowercase, one uppercase, one number and at least 8 characters.");
         return;
     }
-    //Create user:
+    
     try {
+        // Create user:
         await auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 userCredential.user.updateProfile({
                     displayName: name
                 });
                 console.log('User registered');
-                let user = userCredential.user;
-                console.log(user);
+                console.log(userCredential.user);
+                let userUid = userCredential.user.uid;
                 signUpForm.reset();
+                console.log(userUid)
+                // Create user DB document:
+                addNewDocument("users", userUid);
             });
     } catch(error) {
         console.log(`There has been an error with code: ${error.code}: ${error.message}`)
     }
 });
 
-
-/* 
-//Logout function
-logOutButton.addEventListener('click', function (){
+//Log Out function
+function logOut(){
     auth.signOut().then(() => {
-        window.location.href = "/pages/question.html"
+        document.location.href = "index.html";
         console.log('Logout user');
     }).catch((error) => {
       console.log('Error: ', error)
     });
+}
+
+//Observe the user's state
+auth.onAuthStateChanged(user => {
+    if(user){
+        console.log('Logged user');
+        accountAnchorMenuLogged();
+        let userName = auth.currentUser.displayName;
+        console.log(auth.currentUser.uid)
+        //createUserBar(userName);
+    }else{
+        console.log('No logged user');
+    }
 })
-*/
+
+// Changes when logged in:
+function accountAnchorMenuLogged(){
+    let loggedMenu = `<input type="button" id="my_proyects" onclick="goTo("my_proyects")" value="MY PROJECTS"><input type="button" id="profile" onclick="goTo("profile") value="PROFILE"><input type="button" id="log_out_button" onclick="logOut()" value="LOG OUT">`;
+    accountSection.innerHTML += loggedMenu;
+
+    hideShow(document.querySelector("#account_form_signUp"));
+    hideShow(document.querySelector("#account_form_logIn"));
+
+}
+
+// ADDING INFO TO DB main functions:
+// Add a new user in "users" collection:
+async function addNewDocument(collection, doc){
+    await db.collection(collection).doc(doc).set({
+        collection: [],
+        projects: {}
+    })
+    .then(() => {
+        console.log("Document successfully written!");
+    })
+    .catch((error) => {
+        console.error("Error writing document: ", error);
+    });
+};
+// Update field:
+async function updateField(collection, doc, field, value){
+    console.log(field)
+    await db.collection(collection).doc(doc).update({
+        [field]: value
+    })
+    .then(() => {
+        console.log("Document successfully updated!");
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+}
+// Read document info:
+// pepe's uid: "OwW3Bod4reec5cHYLXncsTeyvFi1"
+async function readDocumentInfo(collection, doc){
+    return await db.collection(collection).doc(doc).get().then(querySnapshot => {
+        console.log(querySnapshot.data())
+        return querySnapshot.data();
+    });
+}
 
 
 
@@ -116,14 +181,12 @@ logOutButton.addEventListener('click', function (){
 
 
 
-// "Explore" functions
-// Get answers from "form" and Fetch
+
 
 // Hide-show function:
 function hideShow(element){
     element.classList.toggle("hidden");
 };
-
 // Show-hide "Account" form:
 accountAnchor.addEventListener("click", function (event){
     event.preventDefault();
@@ -132,7 +195,6 @@ accountAnchor.addEventListener("click", function (event){
         hideShow(exploreSection);
     }
 });
-
 // Show-hide "Explore" form:
 exploreAnchor.addEventListener("click", function (event){
     event.preventDefault();
@@ -141,6 +203,10 @@ exploreAnchor.addEventListener("click", function (event){
         hideShow(accountSection);
     }
 });
+
+
+// "Explore" functions
+// Get answers from "form" and Fetch
 
 // Search button function:
 searchForm.addEventListener("submit", function (event){
@@ -246,25 +312,70 @@ async function showFullCard(artwork_id){
     let cardDisplay = document.querySelector(".card_display");
     hideShow(cardDisplay);
 
-    await artworkInfo.then(info => {
+    await artworkInfo.then(async (info) => {
         // Look for card info with id as argument:
-        //let detailedCardInfo = info.find(item => item.id == +artwork_id);
         let detailedCardIndex = info.findIndex(item => item.id == +artwork_id);
         let detailedCardInfo = info[detailedCardIndex];
         let imgSrc = imgSrcArr[detailedCardIndex];
-        let {title, artist_display, date_display, id} = detailedCardInfo;
+        detailedCardInfo.goodImage = imgSrc; // Add the image to full artwork info
+        let {title, artist_display, date_display, id, goodImage} = detailedCardInfo;
         let detailedCard = `<article class="detailedCard">
                                 <h2>${title}</h2>
-                                <img src="${imgSrc}" alt="">
+                                <img src="${goodImage}" alt="">
                                 <p>${artist_display}</p>
                                 <p>${date_display}</p>
                                 <div>
                                     <button id="" onclick="closeDetailedCard()">Close card</button>
-                                    <button id="" onclick="addToProject()">Add card to a project</button>
+                                    <form id="add_to_project_form">
+                                        <select id="select_project" name="selectProject">
+                                        </select>
+                                        <input type="submit" id="add_to_project_input">Add card to project</input>
+                                    </form>
                                 </div>
                             </article>`;
+        // Add select options according to the user's projects
+        await selectProjectOptions(); 
         document.querySelector(".detailed_card_display").innerHTML += detailedCard;
+        // Add to project event listener:
+        let addToProjectForm = document.getElementById("add_to_project_form");
+        addToProjectForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            let projectName = event.target.selectProject.value;
+            addToProject(projectName, detailedCardInfo, id);
+        })
     })             
+}
+
+
+// Select project options:
+async function selectProjectOptions(){
+    await auth.onAuthStateChanged(async (user) => {
+        if(user){
+            let {displayName, email, uid, photoURL} = auth.currentUser;
+            let fields = await readDocumentInfo("users", uid);
+            let projectsNames = Object.keys(fields.projects);
+
+            let selectTag = document.getElementById("select_project");
+            projectsNames.forEach(name => {
+                selectTag.innerHTML += `<option value="${name}" name="selectProject">${name}</option>`
+            });
+        }else{
+            console.log('No logged user');
+        }
+    });
+};
+
+// Add artwork to project:
+async function addToProject(projectName, artworkCard, artworkId){
+    await auth.onAuthStateChanged(async (user) => {
+        if(user){
+            let {displayName, email, uid, photoURL} = auth.currentUser;
+            let field = `projects.${projectName}.${artworkId}`;
+            await updateField("users", uid, field, artworkCard)
+        }else{
+            console.log('No logged user');
+        }
+    });
 }
 
 function closeDetailedCard(){
