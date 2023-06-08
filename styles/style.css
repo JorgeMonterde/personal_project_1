@@ -153,6 +153,9 @@ header {
     box-sizing: border-box;
     font-size: 14px;
 }
+.ghost_images{
+    height: 20vh;
+}
 
 
 /* Footer */

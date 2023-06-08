@@ -443,9 +443,26 @@ function showProjectArtworks(projectsNames){
 function addArtworksToList(projectName, artworksArr, container){
     container.innerHTML += `<div id="${projectName}" class="art_info_div hidden"></div>`;
     let pro_artworks_div = document.querySelector(`#${projectName}`);
-    artworksArr.forEach(artwork => {
+    artworksArr.forEach((artwork, index) => {
+
         let {title, artist_title, date_start, goodImage, id} = artwork;
-        pro_artworks_div.innerHTML += `<div class="artwork_info"><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>`
+        let div = document.createElement("div");
+        //button.setAttribute("id", `button_${projectName}`);
+        div.className = "artwork_info";
+        div.setAttribute("id", `artDiv_${index}`);
+        div.innerHTML = `<span>${title}</span><span>${artist_title}</span><span>${date_start}</span><img src="${goodImage}" class="ghost_images hidden">`;
+        pro_artworks_div.appendChild(div);
+        div.addEventListener("mouseover", (event) => {
+            let ghostImage = document.querySelector(`#artDiv_${index} > img`);
+            hideShow(ghostImage);
+        });
+        div.addEventListener("mouseout", (event) => {
+            let ghostImage = document.querySelector(`#artDiv_${index} > img`);
+            hideShow(ghostImage);
+        })
+
+        /* let {title, artist_title, date_start, goodImage, id} = artwork;
+        pro_artworks_div.innerHTML += `<div class="artwork_info"><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>` */
     });
     // I don't know where is this div element coming from. Remove div:
     let ghostDiv = document.querySelectorAll(".artwork_info div");
@@ -465,3 +482,4 @@ function addProjectButton(projectName){
         showProjectArtworks(projectName);
     })
 }
+
