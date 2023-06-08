@@ -408,6 +408,7 @@ function closeDetailedCard(){
 //Main HTML elements:
 let myProjectsArticle = document.querySelector(".my_projects");
 let artworksArticle = document.querySelector(".artworks");
+let artworkDisplay = document.querySelector(".artwork_display");
 
 // Print projects and artworks on "my projects":
 if(currentPage = "/pages/projects.html"){
@@ -447,22 +448,20 @@ function addArtworksToList(projectName, artworksArr, container){
 
         let {title, artist_title, date_start, goodImage, id} = artwork;
         let div = document.createElement("div");
-        //button.setAttribute("id", `button_${projectName}`);
         div.className = "artwork_info";
         div.setAttribute("id", `artDiv_${index}`);
-        div.innerHTML = `<span>${title}</span><span>${artist_title}</span><span>${date_start}</span><img src="${goodImage}" class="ghost_images hidden">`;
+        div.innerHTML = `<span>${title}</span><span>${artist_title}</span><span>${date_start}</span>`;
+        artworkDisplay.innerHTML += `<img id="artImg_${index}" src="${goodImage}" class="ghost_images hidden">`;
         pro_artworks_div.appendChild(div);
         div.addEventListener("mouseover", (event) => {
-            let ghostImage = document.querySelector(`#artDiv_${index} > img`);
+            console.log(index)
+            let ghostImage = document.querySelector(`#artImg_${index}`);
             hideShow(ghostImage);
         });
         div.addEventListener("mouseout", (event) => {
-            let ghostImage = document.querySelector(`#artDiv_${index} > img`);
+            let ghostImage = document.querySelector(`#artImg_${index}`);
             hideShow(ghostImage);
         })
-
-        /* let {title, artist_title, date_start, goodImage, id} = artwork;
-        pro_artworks_div.innerHTML += `<div class="artwork_info"><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>` */
     });
     // I don't know where is this div element coming from. Remove div:
     let ghostDiv = document.querySelectorAll(".artwork_info div");
