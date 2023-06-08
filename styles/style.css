@@ -3,6 +3,7 @@
     border: 1px solid black;
     
 }
+
 *::-webkit-scrollbar{
     display: none;
 }
@@ -79,8 +80,11 @@ header {
 }
 
 /* Main */
-.hidden{
+.hidden {
     display: none;
+}
+.selected {
+    background-color: var(--color3);
 }
 
 /* Explore section */
@@ -124,7 +128,7 @@ header {
     display: flex;
     flex-direction: row;
     width: 50vw;
-    justify-content: end;
+    justify-content: start;
 }
 .my_projects{
     display: flex;
@@ -136,6 +140,18 @@ header {
 .artworks{
     height: 90vh;
     overflow:auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+.artwork_info{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
 }
 
 

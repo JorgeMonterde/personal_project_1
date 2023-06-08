@@ -425,27 +425,7 @@ async function printProjectsAndArtworks(){
             for(let i=0; i<projectsNames.length; i++){
                 let artworks = Object.values(fields.projects[projectsNames[i]]);
                 addArtworksToList(projectsNames[i], artworks, artworksArticle);
-                
-
-                let button = document.createElement("button");
-                button.setAttribute("id", `button_${projectsNames[i]}`);
-                button.appendChild(document.createTextNode(projectsNames[i]))
-                button.className = "project_name";
-                myProjectsArticle.appendChild(button);
-                button.addEventListener("click", (event)=>{
-                    showProjectArtworks(projectsNames[i]);
-                })
-
-
-                /* console.log(projectsNames[i]);
-                myProjectsArticle.innerHTML += `<button id="button_${projectsNames[i]}" class="project_name">${projectsNames[i]}</button>`;
-                 */
-                
-                /* console.log(button);
-                button.addEventListener("click", ()=>{
-                    showProjectArtworks("JORGE")
-                })*/
-                
+                addProjectButton(projectsNames[i]);
             }
         }else{
             console.log('No logged user');
@@ -454,10 +434,10 @@ async function printProjectsAndArtworks(){
 };
 
 function showProjectArtworks(projectsNames){
-    console.log(projectsNames)
-    //let artworksDiv = document.getElementById(`${projectName}`);
-    //console.log(artworksDiv)
-    //hideShow(projectsNames);
+    let artworksDiv = document.getElementById(projectsNames);
+    let otherArtworksDiv = document.querySelectorAll(".art_info_div");
+    otherArtworksDiv.forEach(item => item.classList.add("hidden"));
+    hideShow(artworksDiv);
 }
 
 function addArtworksToList(projectName, artworksArr, container){
@@ -465,6 +445,23 @@ function addArtworksToList(projectName, artworksArr, container){
     let pro_artworks_div = document.querySelector(`#${projectName}`);
     artworksArr.forEach(artwork => {
         let {title, artist_title, date_start, goodImage, id} = artwork;
-        pro_artworks_div.innerHTML += `<div><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>`
+        pro_artworks_div.innerHTML += `<div class="artwork_info"><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>`
     });
+    // I don't know where is this div element coming from. Remove div:
+    let ghostDiv = document.querySelectorAll(".artwork_info div");
+    ghostDiv.forEach(item => item.remove());
+}
+
+function addProjectButton(projectName){
+    let button = document.createElement("button");
+    button.setAttribute("id", `button_${projectName}`);
+    button.appendChild(document.createTextNode(projectName))
+    button.className = "project_name";
+    myProjectsArticle.appendChild(button);
+    button.addEventListener("click", (event)=>{
+        let allButtons = document.querySelectorAll(".project_name");
+        allButtons.forEach(item => item.classList.remove("selected"));
+        button.classList.add("selected");
+        showProjectArtworks(projectName);
+    })
 }
