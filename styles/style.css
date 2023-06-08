@@ -8,6 +8,7 @@
     display: none;
 }
 
+
 :root {
     --base-light-grey: rgb(228, 228, 228);
     --color1: rgb(201, 201, 201);
@@ -80,13 +81,6 @@ header {
 }
 
 /* Main */
-.hidden {
-    display: none;
-}
-.selected {
-    background-color: var(--color3);
-}
-
 /* Explore section */
 
 /* Card Section */
@@ -153,8 +147,21 @@ header {
     box-sizing: border-box;
     font-size: 14px;
 }
+.artwork_display{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+    justify-items: center;
+    box-sizing: border-box;
+}
+
 .ghost_images{
-    height: 20vh;
+    justify-items: center;
+    align-self: center;
+    max-height: 70vh;
+    width: auto;
+    max-width: 100%;
 }
 
 
@@ -174,4 +181,14 @@ footer{
 }
 .social_network_logo:hover{
     opacity: 1;
+}
+
+
+
+/* States */
+.hidden {
+    display: none;
+}
+.selected {
+    background-color: var(--color3);
 }
