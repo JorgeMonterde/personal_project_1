@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <header>
+        <h1 id="referential" href="">REFERENTIAL</h1>
+        <nav class="explore_account">
+            <h1><a id="explore">EXPLORE</a></h1>
+            <h1><a id="account">ACCOUNT</a></h1>
+        </nav>
+    </header>
+    <main>
+        <section class="explore_section hidden">
+            <form id="explore_form">
+                <input type="text" name="title" id="title" placeholder="title">
+                <input type="text" name="" id="" placeholder="author">
+                <input type="text" name="" id="" placeholder="year">
+                <input type="text" name="" id="" placeholder="medium display">
+                <input type="text" name="" id="" placeholder="style titles">
+                <input type="submit" value="SEARCH">
+            </form>
+        </section>
+        <section class="account_section hidden">
+            <form id="account_form_logIn" class="auth">
+                <input type="text" name="email" id="logIn_email" placeholder="email">
+                <input type="text" name="password" id="logIn_password" placeholder="password">
+                <input type="submit" value="LOG IN">
+            </form>
+            <form id="account_form_signUp" class="auth">
+                <input type="text" name="name" id="signUp_name" placeholder="name">
+                <input type="text" name="email" id="signUp_email" placeholder="email">
+                <input type="text" name="password" id="signUp_password" placeholder="password">
+                <input type="text" name="rePassword" id="signUp_rePassword" placeholder="repeat password">
+                <input type="submit" value="SIGN UP">
+            </form>
+        </section>
+        
+        <section class="my_projects_display">
+            <section class="title_artworksDisplay">
+                <article class="my_projects_title">
+                    <h2>My projects</h2>
+                </article>
+                <article class="artwork_display">
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quos aliquid laboriosam perferendis esse earum praesentium. Commodi pariatur atque eaque at beatae neque explicabo sed reprehenderit, aspernatur fuga nihil, dolore dolorum.</p>
+                </article>
+            </section>
+            <section class="proyects_artworks">
+                <article class="my_projects">
+                    
+                    
+                
+                </article>
+                <article class="artworks">
+                    
+                
+                </article>
+            </section>
+        </section>
+        <section class="detailed_card_display">
+            
+
+            
+        </section>
+    </main>
+    <footer>
+        <div class="social_networks">
+            <a href="https://es-es.facebook.com/" target="_blank">
+                <img src="../assets/images/facebook-logo.png" alt="logo de facebook" class="social_network_logo">
+            </a>
+            <a href="https://www.instagram.com/" target="_blank">
+                <img src="../assets/images/instgram-logo.png" alt="logo de instagram" class="social_network_logo">
+            </a>
+        </div>
+        <div class="sign">
+            <a href="https://www.thebridge.tech/" target="_blank">
+                <img src="https://d92mrp7hetgfk.cloudfront.net/images/sites/misc/The_Bridge_square/original.png?1635962015" alt="logo de instagram" class="social_network_logo">
+            </a>
+        </div>
+        
+    </footer>
+</body>
+ <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
+ <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+ <!-- Add Firebase products that you want to use -->
+ <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-storage.js"></script>
+<script src="/scripts/script.js"></script>
+</html>

@@ -16,13 +16,16 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const user = auth.currentUser;
 
+
+// General information
+let currentPage = window.location.href;
+
 // Main HTML elements
 //"Explore" elements
 let exploreAnchor = document.querySelector("#explore");
 let exploreSection = document.querySelector(".explore_section");
 let searchForm = document.querySelector("#explore_form");
 let cardDisplaySection = document.querySelector(".card_display");
-
 //"Account" elements
 let accountAnchor = document.querySelector("#account");
 let accountSection = document.querySelector(".account_section");
@@ -36,79 +39,85 @@ let logOutButton = document.querySelector("#log_out_button");
 
 // AUTHENTIFICATION main functions:
 //Log in function
-logInForm.addEventListener("submit", async function (event){
-    event.preventDefault();
-    let email = document.getElementById("logIn_email").value;
-    let password = document.getElementById("logIn_password").value;
+if(logInForm){
+    logInForm.addEventListener("submit", async function (event){
+        event.preventDefault();
+        let email = document.getElementById("logIn_email").value;
+        let password = document.getElementById("logIn_password").value;
+    
+        try {
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    console.log('User authenticated')
+                    const user = userCredential.user;
+                    console.log(userCredential);
+                    userEmail = email;
+                    console.log(`Hello, ${email}`);
+                    //logInForm.reset();
+                });
+        } catch (error) {
+            console.log('Invalid user or password');
+        }
+    })
+}
 
-    try {
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                console.log('User authenticated')
-                const user = userCredential.user;
-                console.log(userCredential);
-                userEmail = email;
-                console.log(`Hello, ${email}`);
-                //logInForm.reset();
-            });
-    } catch (error) {
-        console.log('Invalid user or password');
-    }
-})
 
 //Sign up function
-signUpForm.addEventListener("submit", async function (event){
-    event.preventDefault();
-    let name = document.getElementById("signUp_name").value;
-    let email = document.getElementById("signUp_email").value;
-    let password = document.getElementById("signUp_password").value;
-    let rePassword = document.getElementById("signUp_rePassword").value;
-
-    //Validation:
-    const nameRegex = /^[a-z0-9_-]{3,16}$/;
-    const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
-    const passwordRegex = /(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/;
-    if (!nameRegex.test(name)){
-        alert("Name can contain numbers, leters, '_' and '-'.");
-        return;
-    }
-    if(!emailRegex.test(email)){
-        alert("The email format is not allowed.");
-        return;
-    }
-    if(password != rePassword){
-        alert("Repeated password did not match with the first one.");
-        return;
-    }
-    if(!passwordRegex.test(password)){
-        alert("Password should contain one lowercase, one uppercase, one number and at least 8 characters.");
-        return;
-    }
+if (signUpForm){
+    signUpForm.addEventListener("submit", async function (event){
+        event.preventDefault();
+        let name = document.getElementById("signUp_name").value;
+        let email = document.getElementById("signUp_email").value;
+        let password = document.getElementById("signUp_password").value;
+        let rePassword = document.getElementById("signUp_rePassword").value;
     
-    try {
-        // Create user:
-        await auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                userCredential.user.updateProfile({
-                    displayName: name
+        //Validation:
+        const nameRegex = /^[a-z0-9_-]{3,16}$/;
+        const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
+        const passwordRegex = /(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,}$/;
+        if (!nameRegex.test(name)){
+            alert("Name can contain numbers, leters, '_' and '-'.");
+            return;
+        }
+        if(!emailRegex.test(email)){
+            alert("The email format is not allowed.");
+            return;
+        }
+        if(password != rePassword){
+            alert("Repeated password did not match with the first one.");
+            return;
+        }
+        if(!passwordRegex.test(password)){
+            alert("Password should contain one lowercase, one uppercase, one number and at least 8 characters.");
+            return;
+        }
+        
+        try {
+            // Create user:
+            await auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    userCredential.user.updateProfile({
+                        displayName: name
+                    });
+                    console.log('User registered');
+                    console.log(userCredential.user);
+                    let userUid = userCredential.user.uid;
+                    signUpForm.reset();
+                    console.log(userUid)
+                    // Create user DB document:
+                    addNewDocument("users", userUid);
                 });
-                console.log('User registered');
-                console.log(userCredential.user);
-                let userUid = userCredential.user.uid;
-                signUpForm.reset();
-                console.log(userUid)
-                // Create user DB document:
-                addNewDocument("users", userUid);
-            });
-    } catch(error) {
-        console.log(`There has been an error with code: ${error.code}: ${error.message}`)
-    }
-});
+        } catch(error) {
+            console.log(`There has been an error with code: ${error.code}: ${error.message}`)
+        }
+    });
+}
+
 
 //Log Out function
 function logOut(){
     auth.signOut().then(() => {
-        document.location.href = "index.html";
+        document.location.href = "/pages/main.html";
         console.log('Logout user');
     }).catch((error) => {
       console.log('Error: ', error)
@@ -130,7 +139,7 @@ auth.onAuthStateChanged(user => {
 
 // Changes when logged in:
 function accountAnchorMenuLogged(){
-    let loggedMenu = `<input type="button" id="my_proyects" onclick="goTo("my_proyects")" value="MY PROJECTS"><input type="button" id="profile" onclick="goTo("profile") value="PROFILE"><input type="button" id="log_out_button" onclick="logOut()" value="LOG OUT">`;
+    let loggedMenu = `<a href="projects.html">MY PROJECTS</a><a href="">PROFILE</a><input type="button" id="log_out_button" onclick="logOut()" value="LOG OUT">`;
     accountSection.innerHTML += loggedMenu;
 
     hideShow(document.querySelector("#account_form_signUp"));
@@ -188,38 +197,47 @@ function hideShow(element){
     element.classList.toggle("hidden");
 };
 // Show-hide "Account" form:
-accountAnchor.addEventListener("click", function (event){
-    event.preventDefault();
-    hideShow(accountSection);
-    if(!exploreSection.classList.contains("hidden")){
-        hideShow(exploreSection);
-    }
-});
-// Show-hide "Explore" form:
-exploreAnchor.addEventListener("click", function (event){
-    event.preventDefault();
-    hideShow(exploreSection);
-    if(!accountSection.classList.contains("hidden")){
+if(accountAnchor){
+    accountAnchor.addEventListener("click", function (event){
+        event.preventDefault();
         hideShow(accountSection);
-    }
-});
+        if(!exploreSection.classList.contains("hidden")){
+            hideShow(exploreSection);
+        }
+    });
+}
+
+// Show-hide "Explore" form:
+if (exploreAnchor){
+    exploreAnchor.addEventListener("click", function (event){
+        event.preventDefault();
+        hideShow(exploreSection);
+        if(!accountSection.classList.contains("hidden")){
+            hideShow(accountSection);
+        }
+    });
+}
+
 
 
 // "Explore" functions
 // Get answers from "form" and Fetch
 
 // Search button function:
-searchForm.addEventListener("submit", function (event){
-    event.preventDefault();
-    hideShow(exploreSection);
-    let cards = document.querySelectorAll(".card");
-    if(cards){
-        cards.forEach(item => item.remove())
-    }
-    // fetch functions:
-    let wordToLookFor = event.target.title.value;
-    searchArtworksOnAPI(wordToLookFor);
-})
+if(searchForm){
+    searchForm.addEventListener("submit", function (event){
+        event.preventDefault();
+        hideShow(exploreSection);
+        let cards = document.querySelectorAll(".card");
+        if(cards){
+            cards.forEach(item => item.remove())
+        }
+        // fetch functions:
+        let wordToLookFor = event.target.title.value;
+        searchArtworksOnAPI(wordToLookFor);
+    })
+}
+
 
 // Search and print results on cards:
 let artworkInfo;
@@ -329,7 +347,7 @@ async function showFullCard(artwork_id){
                                     <form id="add_to_project_form">
                                         <select id="select_project" name="selectProject">
                                         </select>
-                                        <input type="submit" id="add_to_project_input">Add card to project</input>
+                                        <input type="submit" id="add_to_project_input">
                                     </form>
                                 </div>
                             </article>`;
@@ -383,4 +401,70 @@ function closeDetailedCard(){
     detCard.remove();
     let cardDisplay = document.querySelector(".card_display");
     hideShow(cardDisplay);
+}
+
+
+// ACCOUNT functions:
+//Main HTML elements:
+let myProjectsArticle = document.querySelector(".my_projects");
+let artworksArticle = document.querySelector(".artworks");
+
+// Print projects and artworks on "my projects":
+if(currentPage = "/pages/projects.html"){
+    console.log("HELLO");
+    printProjectsAndArtworks();
+}
+
+async function printProjectsAndArtworks(){
+    await auth.onAuthStateChanged(async (user) => {
+        if(user){
+            let {displayName, email, uid, photoURL} = auth.currentUser;
+            let fields = await readDocumentInfo("users", uid);
+            let projectsNames = Object.keys(fields.projects);
+            let selectedArtworkInfo = [];
+            for(let i=0; i<projectsNames.length; i++){
+                let artworks = Object.values(fields.projects[projectsNames[i]]);
+                addArtworksToList(projectsNames[i], artworks, artworksArticle);
+                
+
+                let button = document.createElement("button");
+                button.setAttribute("id", `button_${projectsNames[i]}`);
+                button.appendChild(document.createTextNode(projectsNames[i]))
+                button.className = "project_name";
+                myProjectsArticle.appendChild(button);
+                button.addEventListener("click", (event)=>{
+                    showProjectArtworks(projectsNames[i]);
+                })
+
+
+                /* console.log(projectsNames[i]);
+                myProjectsArticle.innerHTML += `<button id="button_${projectsNames[i]}" class="project_name">${projectsNames[i]}</button>`;
+                 */
+                
+                /* console.log(button);
+                button.addEventListener("click", ()=>{
+                    showProjectArtworks("JORGE")
+                })*/
+                
+            }
+        }else{
+            console.log('No logged user');
+        }
+    });
+};
+
+function showProjectArtworks(projectsNames){
+    console.log(projectsNames)
+    //let artworksDiv = document.getElementById(`${projectName}`);
+    //console.log(artworksDiv)
+    //hideShow(projectsNames);
+}
+
+function addArtworksToList(projectName, artworksArr, container){
+    container.innerHTML += `<div id="${projectName}" class="art_info_div hidden"></div>`;
+    let pro_artworks_div = document.querySelector(`#${projectName}`);
+    artworksArr.forEach(artwork => {
+        let {title, artist_title, date_start, goodImage, id} = artwork;
+        pro_artworks_div.innerHTML += `<div><span>${title}</span><span>${artist_title}</span><span>${date_start}</span><div>`
+    });
 }
