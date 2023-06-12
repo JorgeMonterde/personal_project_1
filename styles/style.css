@@ -14,6 +14,8 @@
     --color1: rgb(201, 201, 201);
     --color2: rgb(0, 0, 0);
     --color3: rgb(21, 255, 0);
+    --color4: rgb(158, 0, 0);
+
 }
 
 h1 {
@@ -61,7 +63,7 @@ input {
     text-align: center;
 }
 input:hover {
-    background-color: rgb(21, 255, 0);
+    background-color: var(--color3);
 }
 
 
@@ -71,6 +73,7 @@ header {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
+
 }
 .explore_account{
     display: flex;
@@ -82,6 +85,14 @@ header {
 
 /* Main */
 /* Explore section */
+.explore_section, .new_project_section{
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: auto;
+
+}
 
 /* Card Section */
 .card_section{
@@ -105,7 +116,19 @@ header {
 }
 .card img{
     width: 100%;
-
+}
+.detailedCard{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.dc_basic_info img{
+    justify-items: center;
+    align-self: center;
+    max-height: 70vh;
+    width: auto;
+    max-width: 100%;
 }
 
 /* MY PROJECTS */
@@ -155,7 +178,10 @@ header {
     justify-items: center;
     box-sizing: border-box;
 }
-
+.artwork_info:hover{
+    background-color: var(--color3);
+    cursor: pointer;
+}
 .ghost_images{
     justify-items: center;
     align-self: center;
@@ -163,6 +189,7 @@ header {
     width: auto;
     max-width: 100%;
 }
+
 
 
 /* Footer */
@@ -191,4 +218,7 @@ footer{
 }
 .selected {
     background-color: var(--color3);
+}
+.selected_special{
+    background-color: var(--color4);
 }

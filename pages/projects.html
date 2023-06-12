@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main</title>
+    <title>My projects</title>
     <link rel="stylesheet" href="../styles/style.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
         </nav>
     </header>
     <main>
-        <section class="explore_section hidden">
+        <section class="explore_section absolute hidden">
             <form id="explore_form">
                 <input type="text" name="title" id="title" placeholder="title">
                 <input type="text" name="" id="" placeholder="author">
@@ -26,7 +26,7 @@
                 <input type="submit" value="SEARCH">
             </form>
         </section>
-        <section class="account_section hidden">
+        <section class="account_section absolute hidden">
             <form id="account_form_logIn" class="auth">
                 <input type="text" name="email" id="logIn_email" placeholder="email">
                 <input type="text" name="password" id="logIn_password" placeholder="password">
@@ -39,32 +39,23 @@
                 <input type="text" name="rePassword" id="signUp_rePassword" placeholder="repeat password">
                 <input type="submit" value="SIGN UP">
             </form>
-        </section>
-        
+        </section>        
         <section class="my_projects_display">
             <section class="title_artworksDisplay">
                 <article class="my_projects_title">
-                    <h2>My projects</h2>
+                    <h2 class="my_proyect_title">My projects</h2>
                 </article>
                 <article class="artwork_display">
                 </article>
             </section>
             <section class="proyects_artworks">
                 <article class="my_projects">
-                    
-                    
-                
                 </article>
                 <article class="artworks">
-                    
-                
                 </article>
             </section>
         </section>
         <section class="detailed_card_display">
-            
-
-            
         </section>
     </main>
     <footer>

@@ -21,6 +21,7 @@ const user = auth.currentUser;
 let currentPage = window.location.href;
 
 // Main HTML elements
+let everyShowHideSection = document.querySelectorAll(".absolute");
 //"Explore" elements
 let exploreAnchor = document.querySelector("#explore");
 let exploreSection = document.querySelector(".explore_section");
@@ -32,9 +33,11 @@ let accountSection = document.querySelector(".account_section");
 let signUpForm = document.querySelector("#account_form_signUp");
 let logInForm = document.querySelector("#account_form_logIn");
 let logOutButton = document.querySelector("#log_out_button");
+let newProjectSection = document.querySelector(".new_project_section");
 
 //"Detail card" elements
 //let addToProjectForm = document.getElementById("add_to_project_form");
+
 
 
 // AUTHENTIFICATION main functions:
@@ -113,7 +116,6 @@ if (signUpForm){
     });
 }
 
-
 //Log Out function
 function logOut(){
     auth.signOut().then(() => {
@@ -131,7 +133,6 @@ auth.onAuthStateChanged(user => {
         accountAnchorMenuLogged();
         let userName = auth.currentUser.displayName;
         console.log(auth.currentUser.uid)
-        //createUserBar(userName);
     }else{
         console.log('No logged user');
     }
@@ -139,7 +140,7 @@ auth.onAuthStateChanged(user => {
 
 // Changes when logged in:
 function accountAnchorMenuLogged(){
-    let loggedMenu = `<a href="projects.html">MY PROJECTS</a><a href="">PROFILE</a><input type="button" id="log_out_button" onclick="logOut()" value="LOG OUT">`;
+    let loggedMenu = `<a href="main.html">MAIN</a><a href="projects.html">MY PROJECTS</a><a href="">PROFILE</a><input type="button" id="log_out_button" onclick="logOut()" value="LOG OUT">`;
     accountSection.innerHTML += loggedMenu;
 
     hideShow(document.querySelector("#account_form_signUp"));
@@ -200,6 +201,36 @@ function hideShow(element){
         console.log(typeof element)
     }
 };
+
+// "Show-hide" forms (position:absolute) function:
+function hideShowAbsolute(triggerElement, elementToShow){
+    if (triggerElement){
+        triggerElement.addEventListener("click", function (event){
+            event.preventDefault();
+            let isHidden = elementToShow.classList.toggle("hidden");
+            everyShowHideSection.forEach(item => item.classList.add("hidden"));
+
+            if(!isHidden){
+                elementToShow.classList.remove("hidden");
+            } else {
+                elementToShow.classList.add("hidden");
+            }
+        });
+        document.addEventListener("mousedown", function(event){
+            if(!elementToShow.contains(event.target)){
+                elementToShow.classList.add("hidden")
+            }
+        })
+    } else {
+        console.log("'triggerElement' dont exists")
+    }
+}
+
+hideShowAbsolute(exploreAnchor, exploreSection);
+hideShowAbsolute(accountAnchor, accountSection);
+
+
+/* 
 // Show-hide "Account" form:
 if(accountAnchor){
     accountAnchor.addEventListener("click", function (event){
@@ -210,7 +241,8 @@ if(accountAnchor){
         }
     });
 }
-
+ */
+/* 
 // Show-hide "Explore" form:
 if (exploreAnchor){
     exploreAnchor.addEventListener("click", function (event){
@@ -220,7 +252,12 @@ if (exploreAnchor){
             hideShow(accountSection);
         }
     });
-}
+    document.addEventListener("mousedown", function(event){
+        if(!exploreSection.contains(event.target)){
+            exploreSection.classList.add("hidden")
+        }
+    })
+} */
 
 
 
@@ -241,7 +278,6 @@ if(searchForm){
         searchArtworksOnAPI(wordToLookFor);
     })
 }
-
 
 // Search and print results on cards:
 let artworkInfo;
@@ -328,6 +364,36 @@ async function printArtworkCards(artworkInfo, imgSrcArr) {
     });  
 };
 
+// Manage artwork Info and create detailed card:
+async function detailedCardformat(fullCardInfo){
+    let {title, artist_display, date_display, id, goodImage} = fullCardInfo;
+    let detailedCard = `<article class="detailedCard">
+                            <div class="dc_basic_info">
+                                <h2>${title}</h2>
+                                <img src="${goodImage}" alt="">
+                                <p>${artist_display}</p>
+                                <p>${date_display}</p>
+                            </div>
+                            <div class="dc_buttons">
+                                <button id="" onclick="closeDetailedCard()">Close card</button>
+                                <form id="add_to_project_form">
+                                    <select id="select_project" name="selectProject">
+                                    </select>
+                                    <input type="submit" id="add_to_project_input">
+                                </form>
+                            </div>
+                        </article>`;
+    // Add select options according to the user's projects
+    await selectProjectOptions(); 
+    document.querySelector(".detailed_card_display").innerHTML += detailedCard;
+    // Add to project event listener:
+    let addToProjectForm = document.getElementById("add_to_project_form");
+    addToProjectForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        let projectName = event.target.selectProject.value;
+        await addToProject(projectName, fullCardInfo, id);
+    })
+}
 
 // Detailed cards functions:
 async function showFullCard(artwork_id){
@@ -341,31 +407,9 @@ async function showFullCard(artwork_id){
         let detailedCardInfo = info[detailedCardIndex];
         let imgSrc = imgSrcArr[detailedCardIndex];
         detailedCardInfo.goodImage = imgSrc; // Add the image to full artwork info
-        let {title, artist_display, date_display, id, goodImage} = detailedCardInfo;
-        let detailedCard = `<article class="detailedCard">
-                                <h2>${title}</h2>
-                                <img src="${goodImage}" alt="">
-                                <p>${artist_display}</p>
-                                <p>${date_display}</p>
-                                <div>
-                                    <button id="" onclick="closeDetailedCard()">Close card</button>
-                                    <form id="add_to_project_form">
-                                        <select id="select_project" name="selectProject">
-                                        </select>
-                                        <input type="submit" id="add_to_project_input">
-                                    </form>
-                                </div>
-                            </article>`;
-        // Add select options according to the user's projects
-        await selectProjectOptions(); 
-        document.querySelector(".detailed_card_display").innerHTML += detailedCard;
-        // Add to project event listener:
-        let addToProjectForm = document.getElementById("add_to_project_form");
-        addToProjectForm.addEventListener("submit", (event) => {
-            event.preventDefault();
-            let projectName = event.target.selectProject.value;
-            addToProject(projectName, detailedCardInfo, id);
-        })
+
+        detailedCardformat(detailedCardInfo);
+        
     })             
 }
 
@@ -421,11 +465,137 @@ function closeDetailedCard(){
 let myProjectsArticle = document.querySelector(".my_projects");
 let artworksArticle = document.querySelector(".artworks");
 let artworkDisplay = document.querySelector(".artwork_display");
+let projectsArtworksSection = document.querySelector(".proyects_artworks")
 
-// Print projects and artworks on "my projects":
-if(currentPage = "/pages/projects.html"){
-    console.log("HELLO");
-    printProjectsAndArtworks();
+// Add new project:
+async function createNewProject(projectName, info){
+    // RegEx validation here: ...
+    await auth.onAuthStateChanged(async (user) => {
+        if(user){
+
+            let {uid} = auth.currentUser;
+            let field = `projects.${projectName}.info`;
+            await updateField("users", uid, field, info)
+        }else{
+            console.log('No logged user');
+        }
+    });
+}
+
+// Create new project form:
+function createNewProjectSection(){
+    let newProjectSectionStr = `<section class="new_project_section absolute">
+                                    <h3>Create new project</h3>
+                                    <form id="new_project_form">
+                                        <input type="text" name="projectName" id="projectName" placeholder="project name" required>
+                                        <input type="text" name="description" id="description" placeholder="description">
+                                        <input type="submit" id="create_proyect_submit" value="CREATE PROJECT">
+                                    </form>
+                                </section>`;
+    projectsArtworksSection.innerHTML += newProjectSectionStr;
+    // Add "hide-show" function:
+    let newProjectButton = document.querySelector("#new_project_button");
+    let newProjectSection = document.querySelector(".new_project_section");
+    hideShowAbsolute(newProjectButton, newProjectSection);
+    // Add form listener:
+    let createProjectForm = document.querySelector("#new_project_form");
+    createProjectForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        let projectName = event.target.projectName.value;
+        let description = event.target.description.value;
+        let info = {projectName, description};
+        // Add project to Firestore:
+        await createNewProject(projectName, info)
+        hideShow(newProjectSection);
+    });
+}
+
+function addNewProjectButton(){
+    let button = document.createElement("button");
+    button.setAttribute("id", `new_project_button`);
+    button.appendChild(document.createTextNode("+"))
+    button.className = "project_name";
+    myProjectsArticle.appendChild(button);
+
+    button.addEventListener("click", (event)=>{
+        let allButtons = document.querySelectorAll(".project_name");
+        allButtons.forEach(item => item.classList.remove("selected"));
+        button.classList.add("selected_special");
+        createNewProjectSection();
+    })
+}
+
+async function getUserCardInfo(projectName, artworkId){
+    await auth.onAuthStateChanged(async (user) => {
+        if(user){
+            let {uid} = auth.currentUser;
+            let fields = await readDocumentInfo("users", uid);
+            let artwork = fields.projects[projectName][artworkId];
+
+            if(artwork){
+                await showUserFullCards(artwork);
+            }
+        }else{
+            console.log('No logged user');
+        }
+    });
+};
+
+// User detailed cards function: (-----> Idially, "showFullCards" and "showUserFullCard" will be the same function)
+async function showUserFullCards(fullCardInfo){
+    let projectsDisplay = document.querySelector(".my_projects_display");
+    hideShow(projectsDisplay);
+    detailedCardformat(fullCardInfo);
+}
+
+function addArtworksToList(projectName, artworksArr, container){
+    if(container){
+        container.innerHTML += `<div id="${projectName}" class="art_info_div hidden"></div>`;
+        let pro_artworks_div = document.querySelector(`#${projectName}`);
+        artworksArr.forEach((artwork, index) => {
+
+            let {title, artist_title, date_start, goodImage, id} = artwork;
+            let div = document.createElement("div");
+            div.className = "artwork_info";
+            div.setAttribute("id", `artDiv_${index}`);
+            div.innerHTML = `<span>${title}</span><span>${artist_title}</span><span>${date_start}</span>`;
+            artworkDisplay.innerHTML += `<img id="artImg_${index}" src="${goodImage}" class="ghost_images hidden">`;
+            pro_artworks_div.appendChild(div);
+            // Add event listeners:
+            div.addEventListener("mouseover", (event) => {
+                let ghostImage = document.querySelector(`#artImg_${index}`);
+                hideShow(ghostImage);
+            });
+            div.addEventListener("mouseout", (event) => {
+                let ghostImage = document.querySelector(`#artImg_${index}`);
+                hideShow(ghostImage);
+            })
+            div.addEventListener("click", async (event) => {
+                await getUserCardInfo(projectName, id)
+            })
+        });
+        // I don't know where is this div element coming from. Remove div:
+        let ghostDiv = document.querySelectorAll(".artwork_info div");
+        ghostDiv.forEach(item => item.remove());
+    }
+}
+
+function addProjectButton(projectName){
+    let button = document.createElement("button");
+    button.setAttribute("id", `button_${projectName}`);
+    button.appendChild(document.createTextNode(projectName))
+    button.className = "project_name";
+    myProjectsArticle.appendChild(button);
+
+    button.addEventListener("click", (event)=>{
+        let allButtons = document.querySelectorAll(".project_name");
+        allButtons.forEach(item => item.classList.remove("selected"));
+        button.classList.add("selected");
+        let artworksDiv = document.getElementById(projectName);
+        let otherArtworksDiv = document.querySelectorAll(".art_info_div");
+        otherArtworksDiv.forEach(item => item.classList.add("hidden"));
+        hideShow(artworksDiv);
+    })
 }
 
 async function printProjectsAndArtworks(){
@@ -434,7 +604,6 @@ async function printProjectsAndArtworks(){
             let {displayName, email, uid, photoURL} = auth.currentUser;
             let fields = await readDocumentInfo("users", uid);
             let projectsNames = Object.keys(fields.projects);
-            let selectedArtworkInfo = [];
             for(let i=0; i<projectsNames.length; i++){
                 let artworks = Object.values(fields.projects[projectsNames[i]]);
                 addArtworksToList(projectsNames[i], artworks, artworksArticle);
@@ -446,130 +615,9 @@ async function printProjectsAndArtworks(){
     });
 };
 
-function showProjectArtworks(projectsNames){
-    let artworksDiv = document.getElementById(projectsNames);
-    let otherArtworksDiv = document.querySelectorAll(".art_info_div");
-    otherArtworksDiv.forEach(item => item.classList.add("hidden"));
-    hideShow(artworksDiv);
+// Print projects and artworks on "my projects":
+if(currentPage.includes("/pages/projects.html")){
+    printProjectsAndArtworks();
+    addNewProjectButton();
 }
-
-function addArtworksToList(projectName, artworksArr, container){
-    container.innerHTML += `<div id="${projectName}" class="art_info_div hidden"></div>`;
-    let pro_artworks_div = document.querySelector(`#${projectName}`);
-    artworksArr.forEach((artwork, index) => {
-
-        let {title, artist_title, date_start, goodImage, id} = artwork;
-        let div = document.createElement("div");
-        div.className = "artwork_info";
-        div.setAttribute("id", `artDiv_${index}`);
-        div.innerHTML = `<span>${title}</span><span>${artist_title}</span><span>${date_start}</span>`;
-        artworkDisplay.innerHTML += `<img id="artImg_${index}" src="${goodImage}" class="ghost_images hidden">`;
-        pro_artworks_div.appendChild(div);
-        div.addEventListener("mouseover", (event) => {
-            console.log(index)
-            let ghostImage = document.querySelector(`#artImg_${index}`);
-            hideShow(ghostImage);
-        });
-        div.addEventListener("mouseout", (event) => {
-            let ghostImage = document.querySelector(`#artImg_${index}`);
-            hideShow(ghostImage);
-        })
-        div.addEventListener("click", (event) => {
-            getUserCardInfo(projectName, id)
-        })
-
-    });
-    // I don't know where is this div element coming from. Remove div:
-    let ghostDiv = document.querySelectorAll(".artwork_info div");
-    ghostDiv.forEach(item => item.remove());
-}
-
-function addProjectButton(projectName){
-    let button = document.createElement("button");
-    button.setAttribute("id", `button_${projectName}`);
-    button.appendChild(document.createTextNode(projectName))
-    button.className = "project_name";
-    myProjectsArticle.appendChild(button);
-    button.addEventListener("click", (event)=>{
-        let allButtons = document.querySelectorAll(".project_name");
-        allButtons.forEach(item => item.classList.remove("selected"));
-        button.classList.add("selected");
-        showProjectArtworks(projectName);
-    })
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async function getUserCardInfo(projectName, artworkId){
-    await auth.onAuthStateChanged(async (user) => {
-        if(user){
-            let {uid} = auth.currentUser;
-            let fields = await readDocumentInfo("users", uid);
-            
-            let artwork = fields.projects[projectName][artworkId];
-            console.log(artwork)
-            if(artwork){
-                showUserFullCards(artwork);
-            }
-        }else{
-            console.log('No logged user');
-        }
-    });
-};
-
-
-
-
-
-
-
-
-
-// User detailed cards function: (-----> Idially, "showFullCards" and "showUserFullCard" will be the same function)
-async function showUserFullCards(fullCardInfo){
-    let projectsDisplay = document.querySelector(".my_projects_display");
-    hideShow(projectsDisplay);
-
-    let {title, artist_display, date_display, id, goodImage} = fullCardInfo;
-    let detailedCard = `<article class="detailedCard">
-                            <h2>${title}</h2>
-                            <img src="${goodImage}" alt="">
-                            <p>${artist_display}</p>
-                            <p>${date_display}</p>
-                            <div>
-                                <button id="" onclick="closeDetailedCard()">Close card</button>
-                                <form id="add_to_project_form">
-                                    <select id="select_project" name="selectProject">
-                                    </select>
-                                    <input type="submit" id="add_to_project_input">
-                                </form>
-                            </div>
-                        </article>`;
-
-    // Add select options according to the user's projects
-    await selectProjectOptions(); 
-    document.querySelector(".detailed_card_display").innerHTML += detailedCard;
-    // Add to project event listener:
-    let addToProjectForm = document.getElementById("add_to_project_form");
-    addToProjectForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        let projectName = event.target.selectProject.value;
-        addToProject(projectName, detailedCardInfo, id);
-    })
-}         
 
